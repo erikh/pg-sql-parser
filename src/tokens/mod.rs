@@ -14,7 +14,10 @@ pub(crate) trait Token {
 // comments in collection.rs in this directory.
 //
 // The second form is for literals which do not rely on other tokens. This allows us to bootstrap
-// primitive tokens.
+// primitive tokens. Note, these are all converted to character classes when they are constructed,
+// so you must "or" them to combine them together into one character class when using them with the
+// more complex form. This is to prevent feeding the regex engine nested character classes, which
+// are invalid.
 //
 // There's probably a good argument for better use of generics than this macro, but I think this
 // reads better (and should be roughly the same speed).
@@ -45,7 +48,7 @@ macro_rules! make_token {
 
                 Self {
                     pattern: pattern.clone(),
-                    regex: regex::Regex::new(&format!("^({})", pattern)).unwrap(),
+                    regex: regex::Regex::new(&format!("^([{}])", pattern)).unwrap(),
                     captured: String::new(),
                 }
             }

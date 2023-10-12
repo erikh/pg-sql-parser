@@ -16,9 +16,12 @@ use crate::make_token;
 //
 
 // whitespace tokens
-make_token!(Newline, r"[\n\r]");
-make_token!(NonNewlineSpace, r"[ \f\v\t]");
-make_token!(Space, r"[{}{}]", Newline, NonNewlineSpace);
+
+// A couple of constant strings to make composing the character classes a little easier.
+
+make_token!(Newline, r"\n\r");
+make_token!(NonNewlineSpace, r" \f\v\t");
+make_token!(Space, r"[{}|{}]", Newline, NonNewlineSpace);
 make_token!(NonNewline, r"[^{}]", Newline);
 make_token!(Comment, r"--{}*", NonNewline);
 make_token!(Whitespace, r"[{}]+|{}", Space, Comment);
