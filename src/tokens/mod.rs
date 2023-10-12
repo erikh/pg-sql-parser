@@ -9,8 +9,8 @@ pub(crate) trait Token {
 
 // creates a token, takes a regex pattern (string literal). The first argument is the name of the
 // token (must be translatable to a rust type syntactically), the second argument is a literal
-// string used in formatting the regex, and the rest of the arguments are compoents that match that
-// formatted string. See std::format in the rust stdlib for more information.
+// string used in formatting the regex, and the rest of the arguments are components that match
+// that formatted string. See std::format in the rust stdlib for more information.
 //
 // The second form is for literals which do not rely on other tokens. This allows us to bootstrap
 // primitive tokens.

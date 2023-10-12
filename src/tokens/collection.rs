@@ -9,13 +9,18 @@ use super::Token; // this must be used for the `make_token` macro to function he
 use crate::make_token;
 
 // -- start of tokens --
+//
+// In rust, {} is used similar to %s in sprintf(), etc from other languages. The item must
+// implement the std::fmt::Display trait to be formatted, which the make_token provides an
+// implementation for, which is why the definitions can be re-used here with format strings.
+//
 
 // whitespace tokens
 make_token!(Newline, r"[\n\r]");
 make_token!(NonNewlineSpace, r"[ \f\v\t]");
 make_token!(Space, r"[{}{}]", Newline, NonNewlineSpace);
 make_token!(NonNewline, r"[^{}]", Newline);
-make_token!(Comment, r"--[^{}]*", Newline);
+make_token!(Comment, r"--{}*", NonNewline);
 make_token!(Whitespace, r"[{}]+|{}", Space, Comment);
 
 // according to the source, SQL requires at least one newline in the whitespace separating string
