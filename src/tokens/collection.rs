@@ -16,16 +16,21 @@ use crate::make_token;
 //
 
 // whitespace tokens
-
-// A couple of constant strings to make composing the character classes a little easier.
-
 make_token!(Newline, r"\n\r");
 make_token!(NonNewlineSpace, r" \f\v\t");
-make_token!(Space, r"[{}|{}]", Newline, NonNewlineSpace);
+make_token!(Space, r"[{}{}]", Newline, NonNewlineSpace);
 make_token!(NonNewline, r"[^{}]", Newline);
 make_token!(Comment, r"--{}*", NonNewline);
 make_token!(Whitespace, r"[{}]+|{}", Space, Comment);
 
 // according to the source, SQL requires at least one newline in the whitespace separating string
 // literals.
-make_token!(SpecialWhitespace, r"[{}]+|{}{}", Space, Comment, Newline);
+make_token!(SpecialWhitespace, r"{}+|{}{}", Space, Comment, Newline);
+make_token!(NonNewlineWhitespace, r"[{}]|{}", NonNewlineSpace, Comment);
+make_token!(
+    WhitespaceWithNewline,
+    r"[{}]*[{}](?:{})*",
+    NonNewlineSpace,
+    Newline,
+    SpecialWhitespace
+);
