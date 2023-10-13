@@ -79,8 +79,8 @@ make_token!(XQDouble, "[{}]{{2}}", Quote);
 make_token!(XQInside, "[^']+");
 
 // Dollar quoting
-make_token!(DolQStart, r"[A-Za-z\200-\377_]");
-make_token!(DolQContinue, r"[A-Za-z\200-\377_0-9]");
+make_token!(DolQStart, r#"A-Za-z\200-\377_"#);
+make_token!(DolQContinue, r#"A-Za-z\200-\377_0-9"#);
 make_token!(DolQDelimiter, r"\$(?:{}{}*)?\$", DolQStart, DolQContinue);
 make_token!(DolQFailed, r"\$(?:{}{}*", DolQStart, DolQContinue);
 make_token!(DolQInside, r"[^$]+");
@@ -101,3 +101,61 @@ make_token!(XUIStart, "[uU]&{}", DoubleQuote);
 make_token!(XUSStart, "[uU]&{}", Quote);
 // Error Rule
 make_token!(XUFailed, "[uU]&");
+
+/*
+ * single character tokens (that aren't whitespace)
+ *
+ * these are presented out of order compared to the canonical lexer, but we build the token
+ * ordering independently of these macros. The reason these are in this place is so that they can
+ * be re-used safely in following tokens.
+ */
+
+// this is "self" in the lexer; rust can't use Self as a struct name for (hopefully) obvious
+// reasons.
+make_token!(SCTokens, r#",()\[\].;\:\+\-\*\/\%\^\<\>\="#);
+make_token!(OpChars, r#"\~\!\@\#\^\&\|\`\?\+\-\*\/\%\<\>\="#);
+make_token!(Operator, "[{}]+", OpChars);
+
+/*
+ * -- C style comments --
+ *
+ * Please see src/backend/parser/scan.l in the postgresql source for additional flavor on the
+ * behavior of these tokens.
+ */
+
+make_token!(XCStart, r#"\/\*[{}]*"#, OpChars);
+make_token!(XCStop, r#"\*+\/"#);
+make_token!(XCInside, r#"[^*/]+"#);
+
+make_token!(IdentStart, r#"A-Za-z\200-\377_"#);
+make_token!(IdentCont, r#"A-Za-z\200-\377_0-9$"#);
+make_token!(Identifier, "[{}][{}]*", IdentStart, IdentCont);
+
+/*
+ * -- special-case operators --
+ */
+
+// hacks to make my character-class constructor work right; not present in original lexer.
+// these might go away later.
+make_token!(Colon, ":");
+make_token!(Dot, ".");
+
+make_token!(Typecast, "{}{}", Colon, Colon);
+make_token!(DotDot, "{}{}", Dot, Dot);
+make_token!(ColonEquals, "{}=", Colon);
+
+/*
+ * -- operator-like tokens --
+ */
+
+// More hacks to make my own flavor work
+make_token!(Greater, ">");
+make_token!(Less, "<");
+make_token!(Equals, "=");
+make_token!(Not, "=");
+
+make_token!(EqualsGreater, "{}{}", Equals, Greater);
+make_token!(LessEquals, "{}{}", Less, Equals);
+make_token!(GreaterEquals, "{}{}", Greater, Equals);
+make_token!(LessGreater, "{}{}", Less, Greater);
+make_token!(NotEquals, "{}{}", Not, Equals);
