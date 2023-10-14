@@ -2,8 +2,7 @@ pub(crate) mod collection;
 
 // all tokens implement Token, by way of the `make_token` macro below.
 pub(crate) trait Token {
-    fn captured(&mut self, input: &str) -> bool;
-    fn contained(&self) -> String;
+    fn captured(&self, input: &str) -> Option<String>;
     fn pattern(&self) -> &str;
 }
 
@@ -63,6 +62,7 @@ macro_rules! make_token {
 #[macro_export]
 macro_rules! make_token_struct {
     ($name:ident) => {
+        #[derive(Clone)]
         pub(crate) struct $name {
             pattern: String,
             regex: regex::Regex,
@@ -76,17 +76,12 @@ macro_rules! make_token_struct {
         }
 
         impl Token for $name {
-            fn captured(&mut self, input: &str) -> bool {
+            fn captured(&self, input: &str) -> Option<String> {
                 if let Some(cap) = self.regex.captures(input) {
-                    self.captured = cap[1].to_string();
-                    return true;
+                    return Some(cap[1].to_string());
                 }
 
-                false
-            }
-
-            fn contained(&self) -> String {
-                self.captured.clone()
+                None
             }
 
             fn pattern(&self) -> &str {
