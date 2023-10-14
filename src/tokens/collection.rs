@@ -158,3 +158,52 @@ make_token!(LessEquals, "{}{}", Less, Equals);
 make_token!(GreaterEquals, "{}{}", Greater, Equals);
 make_token!(LessGreater, "{}{}", Less, Greater);
 make_token!(NotEquals, "{}{}", Not, Equals);
+
+/*
+ * Numbers
+ */
+
+// stub tokens; it's important to remember these are character classes in the macro.
+make_token!(DecDigit, "0-9");
+make_token!(HexDigit, "0-9A-Fa-f");
+make_token!(OctDigit, "0-7");
+make_token!(BinDigit, "01");
+
+make_token!(DecInteger, "[{}](?:_?[{}])*", DecDigit, DecDigit);
+make_token!(HexInteger, "0[xX](?:_?[{}])+", HexDigit);
+make_token!(OctInteger, "0[oO](?:_?[{}])+", OctDigit);
+make_token!(BinInteger, "0[bB](?:_?[{}])+", BinDigit);
+
+make_token!(HexFail, "0[xX]_?");
+make_token!(OctFail, "0[oO]_?");
+make_token!(BinFail, "0[bB]_?");
+
+make_token!(
+    Numeric,
+    r#"(?:(?:{}\.{})|(?:\.{}))"#,
+    DecInteger,
+    DecInteger,
+    DecInteger
+);
+make_token!(NumericFail, r#"[{}]+\.\."#, DecDigit);
+
+make_token!(
+    Real,
+    "(?:{}|{})[eE][-+]?{}",
+    DecInteger,
+    Numeric,
+    DecInteger
+);
+make_token!(RealFail, "(?:{}|{})[eE][-+]", DecInteger, Numeric);
+
+// Not quite sure what the purpose of these tokens are yet.
+make_token!(DecIntegerJunk, "{}[{}]", DecInteger, IdentStart);
+make_token!(HexIntegerJunk, "{}[{}]", HexInteger, IdentStart);
+make_token!(OctIntegerJunk, "{}[{}]", OctInteger, IdentStart);
+make_token!(BinIntegerJunk, "{}[{}]", BinInteger, IdentStart);
+make_token!(NumericJunk, "{}[{}]", Numeric, IdentStart);
+// Megan Thee Stallion token
+make_token!(RealJunk, "{}[{}]", Real, IdentStart);
+
+make_token!(Param, r#"\${}"#, DecInteger);
+make_token!(ParamJunk, r#"\${}[{}]"#, DecInteger, IdentStart);
