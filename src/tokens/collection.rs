@@ -144,6 +144,7 @@ make_token!(Less, "<");
 make_token!(Equals, "=");
 make_token!(Not, "!");
 
+// These *are* present in the original lexer.
 make_token!(Typecast, "{}{}", Colon, Colon);
 make_token!(DotDot, "{}{}", Dot, Dot);
 make_token!(ColonEquals, "{}{}", Colon, Equals);
