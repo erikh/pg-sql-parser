@@ -139,20 +139,18 @@ make_token!(Identifier, "[{}][{}]*", IdentStart, IdentCont);
 // these might go away later.
 make_token!(Colon, ":");
 make_token!(Dot, ".");
-
-make_token!(Typecast, "{}{}", Colon, Colon);
-make_token!(DotDot, "{}{}", Dot, Dot);
-make_token!(ColonEquals, "{}=", Colon);
-
-/*
- * -- operator-like tokens --
- */
-
-// More hacks to make my own flavor work
 make_token!(Greater, ">");
 make_token!(Less, "<");
 make_token!(Equals, "=");
 make_token!(Not, "!");
+
+make_token!(Typecast, "{}{}", Colon, Colon);
+make_token!(DotDot, "{}{}", Dot, Dot);
+make_token!(ColonEquals, "{}{}", Colon, Equals);
+
+/*
+ * -- operator-like tokens --
+ */
 
 make_token!(EqualsGreater, "{}{}", Equals, Greater);
 make_token!(LessEquals, "{}{}", Less, Equals);
