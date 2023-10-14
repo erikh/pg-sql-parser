@@ -152,7 +152,7 @@ make_token!(ColonEquals, "{}=", Colon);
 make_token!(Greater, ">");
 make_token!(Less, "<");
 make_token!(Equals, "=");
-make_token!(Not, "=");
+make_token!(Not, "!");
 
 make_token!(EqualsGreater, "{}{}", Equals, Greater);
 make_token!(LessEquals, "{}{}", Less, Equals);
