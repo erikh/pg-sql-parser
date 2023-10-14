@@ -28,19 +28,21 @@ impl<'a> State<'a> {
         self.end
     }
 
-    pub fn scan(&self, input: &str, offset: usize) -> Result<State> {
+    pub fn scan(&self, input: &str, offset: usize) -> Result<(&dyn Token, State)> {
         if input.is_empty() {
             return Err(anyhow!("Premature end of input"));
         }
 
         let mut m = String::new();
         let mut s: Option<State> = None;
+        let mut t: Option<&dyn Token> = None;
 
         for (token, state) in &self.following {
             if let Some(capture) = token.captured(input) {
                 if capture.len() > m.len() {
                     m = capture;
                     s = Some(state.clone());
+                    t = Some(*token);
                 }
             }
         }
@@ -49,6 +51,10 @@ impl<'a> State<'a> {
             return Err(anyhow!("Syntax error in `{}` at offset {}", input, offset));
         }
 
-        Ok(s.unwrap())
+        if let (Some(token), Some(state)) = (t, s) {
+            return Ok((token, state));
+        }
+
+        return Err(anyhow!("Internal Error in Scanner"));
     }
 }
