@@ -11,12 +11,26 @@ pub(crate) fn build_state_machine<'a>() -> State<'a> {
         tokens,
         (Whitespace, build_skip_state!()),
         (
+            // Comments
+            XCStart,
+            build_state!(
+                tokens,
+                (
+                    XCInside,
+                    build_state!(tokens, (XCStop, build_final_state!()))
+                ),
+                // to avoid matching operators by accident
+                (OpChars, build_skip_state!())
+            )
+        ),
+        (
+            // bitstrings
             XBStart,
             build_state!(
                 tokens,
                 (
                     XBInside,
-                    build_state!(tokens, (XBEnd, build_final_state!()))
+                    build_state!(tokens, (XBStop, build_final_state!()))
                 )
             )
         )
