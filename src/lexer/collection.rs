@@ -55,6 +55,50 @@ pub(crate) fn build_state_machine<'a>() -> State<'a> {
                     build_state!(tokens, (XNStop, build_final_state!()))
                 )
             )
+        ),
+        (
+            // extended quoted strings
+            // FIXME this probably doesn't work right, I need to give the lexer a way to support
+            // epsilon moves
+            XEStart,
+            build_state!(
+                tokens,
+                (
+                    XEEscape,
+                    build_state!(tokens, (XEStop, build_final_state!()))
+                ),
+                (
+                    XEOctEscape,
+                    build_state!(tokens, (XEStop, build_final_state!()))
+                ),
+                (
+                    XEHexEscape,
+                    build_state!(tokens, (XEStop, build_final_state!()))
+                ),
+                (
+                    XEUnicode,
+                    build_state!(tokens, (XEStop, build_final_state!()))
+                ),
+                (
+                    XEInside,
+                    build_state!(tokens, (XEStop, build_final_state!()))
+                )
+            )
+        ),
+        (
+            // quoted strings
+            XQStart,
+            build_state!(
+                tokens,
+                (
+                    XQInside,
+                    build_state!(tokens, (XQStop, build_final_state!()))
+                ),
+                (
+                    XQDouble,
+                    build_state!(tokens, (XQStop, build_final_state!()))
+                )
+            )
         )
     ))
 }

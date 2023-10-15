@@ -79,7 +79,7 @@ pub(crate) fn build_tokens<'a>(tokens: &mut TokenMap<'a>) {
 
     // Quoted string with escaping
     make_token!(tokens, XEStart, "[eE]{}", Quote);
-    make_token!(tokens, XEInside, "[^\\']+");
+    make_token!(tokens, XEInside, "[^']+");
     make_token!(tokens, XEEscape, "[\\][^0-7]");
     make_token!(tokens, XEOctEscape, "[\\][0-7]{1,3}");
     make_token!(tokens, XEHexEscape, "[\\]x[0-9a-fA-F]{1,2}");
@@ -93,11 +93,13 @@ pub(crate) fn build_tokens<'a>(tokens: &mut TokenMap<'a>) {
         XEUnicodeFail,
         r"[\\](?:u[0-9a-fA-F]{0,3}|U[0-9a-fA-F]{0,7})"
     );
+    make_token!(tokens, XEStop, "{}", Quote);
 
     // Extended Quote
     make_token!(tokens, XQStart, "[{}]", Quote);
     make_token!(tokens, XQDouble, "[{}]{{2}}", Quote);
     make_token!(tokens, XQInside, "[^']+");
+    make_token!(tokens, XQStop, "[{}]", Quote);
 
     // Dollar quoting
     make_token!(tokens, DolQStart, r#"A-Za-z\200-\377_"#);
