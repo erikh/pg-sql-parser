@@ -1,92 +1,70 @@
+use std::collections::BTreeMap;
+
 pub(crate) mod collection;
 
-// all tokens implement Token, by way of the `make_token` macro below.
-pub(crate) trait Token {
-    fn captured(&self, input: &str) -> Option<String>;
-    fn pattern(&self) -> &str;
+pub(crate) type TokenMap<'a> = BTreeMap<&'a str, Token<'a>>;
+
+#[derive(Clone)]
+pub(crate) struct Token<'a> {
+    name: &'a str,
+    pattern: String,
+    regex: regex::Regex,
 }
 
-// creates a token, takes a regex pattern (string literal), and optionally, a list of other tokens
-// to include as a part of this token.
-//
-// In the first form, the first argument is the name of the token (must be translatable to a rust
-// type syntactically), the second argument is a literal string used in formatting the regex, and
-// the rest of the arguments are components that match that formatted string. See std::format in
-// the rust stdlib for more information, as well as the comments in collection.rs in this
-// directory.
-//
-// The second form is for literals which do not rely on other tokens. This allows us to bootstrap
-// primitive tokens. Note, these are all converted to character classes when they are constructed,
-// so you must "or" them to combine them together into one character class when using them with the
-// more complex form. This is to prevent feeding the regex engine nested character classes, which
-// are invalid.
-//
-// There's probably a good argument for better use of generics than this macro, but I think this
-// reads better (and should be roughly the same speed).
+impl<'a> Token<'a> {
+    pub fn initial(name: &'a str, pattern: String) -> Self {
+        Self {
+            name,
+            pattern: pattern.clone(),
+            regex: regex::Regex::new(&format!("^([{}])", pattern)).unwrap(),
+        }
+    }
+
+    pub fn new(name: &'a str, pattern: String) -> Self {
+        Self {
+            name,
+            pattern: pattern.clone(),
+            regex: regex::Regex::new(&format!("^({})", pattern)).unwrap(),
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        self.name
+    }
+
+    pub fn captured(&self, input: &str) -> Option<String> {
+        if let Some(cap) = self.regex.captures(input) {
+            return Some(cap[1].to_string());
+        }
+
+        None
+    }
+
+    pub fn pattern(&self) -> &str {
+        &self.pattern
+    }
+}
+
+impl<'a> std::fmt::Display for Token<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.pattern())
+    }
+}
+
 #[macro_export]
 macro_rules! make_token {
-    ($name:ident, $match:literal, $($format:ident),*) => {
-        $crate::make_token_struct!($name);
-
-        impl $name {
-            pub fn new() -> $name {
-                let pattern = format!($match, $($format::new(),)*);
-
-                Self {
-                    pattern: pattern.clone(),
-                    regex: regex::Regex::new(&format!("^({})", pattern)).unwrap(),
-                    captured: String::new(),
-                }
-            }
-        }
+    ($collection:ident, $name:ident, $match:literal, $($format:ident),*) => {
+        $collection.insert("$name", Token::new("$name", format!($match, $($crate::lookup_token!($collection, $format),)*)));
     };
 
-    ($name:ident, $match:literal) => {
-        $crate::make_token_struct!($name);
-
-        impl $name {
-            pub fn new() -> $name {
-                let pattern = String::from($match);
-
-                Self {
-                    pattern: pattern.clone(),
-                    regex: regex::Regex::new(&format!("^([{}])", pattern)).unwrap(),
-                    captured: String::new(),
-                }
-            }
-        }
+    ($collection:ident, $name:ident, $match:literal) => {
+        $collection.insert("$name", Token::initial("$name", String::from($match)));
     };
 }
 
-// this macro just makes it easier to construct the other macro without repetition.
 #[macro_export]
-macro_rules! make_token_struct {
-    ($name:ident) => {
-        #[derive(Clone)]
-        pub(crate) struct $name {
-            pattern: String,
-            regex: regex::Regex,
-            captured: String,
-        }
-
-        impl std::fmt::Display for $name {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str(self.pattern())
-            }
-        }
-
-        impl Token for $name {
-            fn captured(&self, input: &str) -> Option<String> {
-                if let Some(cap) = self.regex.captures(input) {
-                    return Some(cap[1].to_string());
-                }
-
-                None
-            }
-
-            fn pattern(&self) -> &str {
-                self.pattern.as_str()
-            }
-        }
+macro_rules! lookup_token {
+    ($collection:ident, $name:ident) => {
+        $collection["$name"].clone()
     };
 }
