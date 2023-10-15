@@ -22,8 +22,6 @@ macro_rules! build_final_state {
 #[macro_export]
 macro_rules! build_initial_states {
     ($($state:expr),*) => {{
-        let mut state = State::new(vec![$((None, $state),)*]);
-        state.mark_final();
-        state
+        State::new(vec![$((None, $state),)*])
     }};
 }

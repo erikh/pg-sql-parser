@@ -7,6 +7,5 @@ use crate::{
 pub(crate) fn build_state_machine<'a>() -> State<'a> {
     let mut tokens = TokenMap::default();
     build_tokens(&mut tokens);
-    let end = build_final_state!();
-    build_initial_states!(build_state!(tokens, (XBStart, end)))
+    build_initial_states!(build_state!(tokens, (XBStart, build_final_state!())))
 }
