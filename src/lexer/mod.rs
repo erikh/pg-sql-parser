@@ -3,7 +3,7 @@ pub(crate) mod state;
 
 #[macro_export]
 macro_rules! build_state {
-    ($collection:ident, $(($token:ident, $state:ident)),*) => {{
+    ($collection:ident, $(($token:ident, $state:expr)),*) => {{
         use super::state::State;
 
         State::new(vec![$((Some(lookup_token!($collection, $token)), $state),)*])
@@ -21,7 +21,7 @@ macro_rules! build_final_state {
 
 #[macro_export]
 macro_rules! build_initial_states {
-    ($($state:ident),*) => {{
+    ($($state:expr),*) => {{
         let mut state = State::new(vec![$((None, $state),)*]);
         state.mark_final();
         state
