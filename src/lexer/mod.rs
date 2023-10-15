@@ -11,6 +11,15 @@ macro_rules! build_state {
 }
 
 #[macro_export]
+macro_rules! build_skip_state {
+    () => {{
+        let mut state = State::new(vec![]);
+        state.mark_skip();
+        state
+    }};
+}
+
+#[macro_export]
 macro_rules! build_final_state {
     () => {{
         let mut state = State::new(vec![]);

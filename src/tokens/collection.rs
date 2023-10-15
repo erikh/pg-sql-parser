@@ -65,6 +65,7 @@ pub(crate) fn build_tokens<'a>(tokens: &mut TokenMap<'a>) {
     // bytes
     make_token!(tokens, XBStart, "[bB]{}", Quote);
     make_token!(tokens, XBInside, "[^']*");
+    make_token!(tokens, XBEnd, "{}", Quote);
 
     // hex
     make_token!(tokens, XHStart, "[xX]{}", Quote);
