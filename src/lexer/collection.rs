@@ -33,6 +33,28 @@ pub(crate) fn build_state_machine<'a>() -> State<'a> {
                     build_state!(tokens, (XBStop, build_final_state!()))
                 )
             )
+        ),
+        (
+            // hex strings
+            XHStart,
+            build_state!(
+                tokens,
+                (
+                    XHInside,
+                    build_state!(tokens, (XHStop, build_final_state!()))
+                )
+            )
+        ),
+        (
+            // national strings
+            XNStart,
+            build_state!(
+                tokens,
+                (
+                    XNInside,
+                    build_state!(tokens, (XNStop, build_final_state!()))
+                )
+            )
         )
     ))
 }

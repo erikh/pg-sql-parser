@@ -70,9 +70,12 @@ pub(crate) fn build_tokens<'a>(tokens: &mut TokenMap<'a>) {
     // hex
     make_token!(tokens, XHStart, "[xX]{}", Quote);
     make_token!(tokens, XHInside, "[^']*");
+    make_token!(tokens, XHStop, "{}", Quote);
 
     // national (?) characters
     make_token!(tokens, XNStart, "[nN]{}", Quote);
+    make_token!(tokens, XNInside, "[^']*");
+    make_token!(tokens, XNStop, "{}", Quote);
 
     // Quoted string with escaping
     make_token!(tokens, XEStart, "[eE]{}", Quote);
